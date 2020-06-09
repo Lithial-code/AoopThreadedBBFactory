@@ -12,7 +12,7 @@ public class CustomPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        for(Node node: gameMap.nodes){
+        for(Node node: gameMap.gridAsList()){
             node.draw(g);
         }
     }

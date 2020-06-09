@@ -6,11 +6,15 @@ import java.util.List;
 public class GameMap {
     private int xSize;
     private int ySize;
-    public List<Node> nodes = new ArrayList<>();
+    public Node[][] grid;
+    public Node startNode;
+    public Node endNode;
 
     public GameMap(int xSize, int ySize) {
         this.ySize = ySize;
         this.xSize = xSize;
+        System.out.println("Got here");
+        grid = new Node[xSize][ySize];
         genNodes();
     }
 
@@ -21,12 +25,14 @@ public class GameMap {
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 Node node = new Node(i, j);
-                nodes.add(node);
+                grid[i][j] = node;
             }
         }
-        for (Node node :
-                nodes) {
-            node.setNeighbours(this);
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++) {
+                grid[i][j].setNeighbours(this);
+            }
+
         }
     }
 
@@ -37,11 +43,21 @@ public class GameMap {
      * @return
      */
     public Node getNode(int x, int y) {
-        for (Node node : nodes) {
+        for (Node node : gridAsList()) {
             if (node.getX() == x && node.getY() == y) {
                 return node;
             }
         }
         return null;
+    }
+    //make the grid a list
+    public List<Node> gridAsList(){
+     List<Node> nodes = new ArrayList<>();
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++) {
+                nodes.add(grid[i][j]);
+            }
+        }
+        return nodes;
     }
 }

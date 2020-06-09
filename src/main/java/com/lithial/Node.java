@@ -9,8 +9,17 @@ public class Node {
     private int xPosition;
     private int yPosition;
     private int size;
-    private Map<Node, Double> neighbours = new HashMap<>();
+
+    private int fCost;
+    private  int gCost;
+    private  int hCost;
+
+    private boolean walkable;
+    private Node parent;
+
+    private Map<Node, Integer> neighbours = new HashMap<>();
     private Color color;
+
     public Node(int x, int y) {
         this.x = x;
         this.y = y;
@@ -18,6 +27,7 @@ public class Node {
         this.xPosition = x * size;
         this.yPosition = y * size;
         color = Color.white;
+        walkable = true;
     }
 
     /**
@@ -25,17 +35,17 @@ public class Node {
      * @param map
      */
     public void setNeighbours(GameMap map){
-        neighbours.put(map.getNode(x-1,y-1), 1.4);    //-1 -1
-        neighbours.put(map.getNode(x-1, y), 1d);       //-1 0
-        neighbours.put(map.getNode(x-1,y+1),1.4);     //-1 +1
-        neighbours.put(map.getNode(x,y-1),1d);          // 0 -1
-        neighbours.put(map.getNode( x,y+1),1d);          //0 +1
-        neighbours.put(map.getNode(x+1,y-1),1.4);     //+1 -1
-        neighbours.put(map.getNode(x+1,y),1d);          //+1 0
-        neighbours.put(map.getNode(x+1,y+1),1.4);     //+1 +1
+        neighbours.put(map.getNode(x-1,y-1), 14);    //-1 -1
+        neighbours.put(map.getNode(x-1, y), 10);       //-1 0
+        neighbours.put(map.getNode(x-1,y+1),14);     //-1 +1
+        neighbours.put(map.getNode(x,y-1),10);          // 0 -1
+        neighbours.put(map.getNode( x,y+1),10);          //0 +1
+        neighbours.put(map.getNode(x+1,y-1),14);     //+1 -1
+        neighbours.put(map.getNode(x+1,y),10);          //+1 0
+        neighbours.put(map.getNode(x+1,y+1),14);     //+1 +1
     }
 
-    public Map<Node, Double> getNeighbours() {
+    public Map<Node, Integer> getNeighbours() {
         return neighbours;
     }
 
@@ -60,6 +70,44 @@ public class Node {
     }
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public int getfCost() {
+        return gCost + hCost;
+    }
+    public int gethCost(){
+        return hCost;
+    }
+    public int getgCost(){
+        return gCost;
+    }
+
+    public void setfCost(int fCost) {
+        this.fCost = fCost;
+    }
+
+    public void setgCost(int gCost) {
+        this.gCost = gCost;
+    }
+
+    public void sethCost(int hCost) {
+        this.hCost = hCost;
+    }
+
+    public boolean isWalkable() {
+        return walkable;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
+    public Node getParent() {
+        return parent;
+    }
+
+    public void setWalkable(boolean walkable) {
+        this.walkable = walkable;
     }
 
     public void draw(Graphics g){

@@ -9,7 +9,7 @@ public class Debug {
      * @param node
      */
     public static void PaintNeighbours(Node node) {
-        for(Map.Entry<Node, Double> entry : node.getNeighbours().entrySet()) {
+        for(Map.Entry<Node, Integer> entry : node.getNeighbours().entrySet()) {
             if (entry.getKey() != null) {
                 Node n = entry.getKey();
                 System.out.println(n.getName());
