@@ -54,16 +54,6 @@ public class Node implements IColliadable {
                 }
             }
         }
-        /*neighbours.put(map.getNode(x-1,y-1), 14);    //-1 -1
-        neighbours.put(map.getNode(x-1, y), 10);       //-1 0
-        neighbours.put(map.getNode(x-1,y+1),14);     //-1 +1
-        neighbours.put(map.getNode(x,y-1),10);          // 0 -1
-        neighbours.put(map.getNode( x,y+1),10);          //0 +1
-        neighbours.put(map.getNode(x+1,y-1),14);     //+1 -1
-        neighbours.put(map.getNode(x+1,y),10);          //+1 0
-        neighbours.put(map.getNode(x+1,y+1),14);     //+1 +1
-
-         */
     }
 
     public Map<Node, Integer> getNeighbours() {

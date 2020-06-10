@@ -20,7 +20,7 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
     //id variables
     private String name;
     //positioning variables
-    private int x, y;
+    private float x, y;
 
     private Node currentNode;
     private Node targetNode;
@@ -29,7 +29,7 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
     private List<Node>path;
     private GameMap map;
     //movement variables
-    private int speed;
+    private float speed;
     //rendering variables
     private Color color;
 
@@ -85,17 +85,17 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
         System.out.println("Moving");
         if (targetNode != null){
             if (x < targetNode.getX()){
-                x++;
+                x+=speed;
             }
-            if (y < targetNode.getY())
+            else if (y < targetNode.getY())
             {
-                y++;
+                y+=speed;
             }
-            if (x > targetNode.getX()){
-                x--;
+            else if (x > targetNode.getX()){
+                x-=speed;
             }
-            if (y > targetNode.getX()){
-                y--;
+            else if (y > targetNode.getY()){
+                y-=speed;
             }
             System.out.println(x + ":" + y);
         }
@@ -103,53 +103,8 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
             System.out.println("we're here!!");
         }
 
-           // moveObject(10);
-
-            //CollisionManager.handleCollision(this);
-        // }
-       /* if (finalDestinationNode != null) {
-            path = Pathfinder.AStar(map.gridAsList(), currentNode, finalDestinationNode);
-            //     System.out.println("Target node set to: " + targetNode.getSimpleName());
-
-            while (!path.isEmpty()) {
-                int count = 0;
-                targetNode = path.get(count);
-                System.out.println("X: " + x + " / Y: " + y);
-                if (targetNode == currentNode) {
-                    path.remove(currentNode);
-                    System.out.println("TargetNode deleted because we're there");
-                }
-                //while(currentNode != targetNode){}
-                //this.currentLocation.setX(targetNode.getX() * GameInfo.NODE_SIZE);
-                //this.currentLocation.setY(targetNode.getY() * GameInfo.NODE_SIZE);
-                count++;
-                moveObject(0.4f);
-            }
-        }*/
     }
-                /*
-                while(currentNode != targetNode){
 
-                    if (x < targetNode.getCentreOfTile().getX()) {
-
-                        x += GameInfo.MINION_SPEED;
-                    }
-                    if(x > targetNode.getCentreOfTile().getX()) {
-                        x -= GameInfo.MINION_SPEED;
-                    }
-                    if (y < targetNode.getCentreOfTile().getY()) {
-                        y += GameInfo.MINION_SPEED;
-                    }
-                    if (y > targetNode.getCentreOfTile().getY()) {
-                        y -= GameInfo.MINION_SPEED;
-                    }/*
-                    //CollisionManager.handleCollision(this);
-                }
-            }
-            //currentLocation.setX(x += getxDirection());
-            //currentLocation.setY(y += getyDirection());
-        }
-    }
 
     /**
      * used to draw the token that is used to represent the minion
@@ -166,12 +121,12 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
             startNode.setColor(Color.red);
         }
         graphics.setColor(color);
-        graphics.fillRect(x * GameInfo.NODE_SIZE, y * GameInfo.NODE_SIZE, GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
+        graphics.fillRect((int)(x * GameInfo.NODE_SIZE), (int)(y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
     }
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x * GameInfo.NODE_SIZE, y * GameInfo.NODE_SIZE, GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
+        return new Rectangle((int)(x * GameInfo.NODE_SIZE), (int)(y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
     }
 
     @Override
@@ -184,23 +139,5 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
         //System.out.println(getCurrentNode().getSimpleName());
     }
     }
-    public boolean moveObject() {
 
-//Work out the distance to travel
-        float distance = (float) Math.sqrt(Math.pow(targetNode.getX() - x, 2) + Math.pow(targetNode.getY() - y, 2));
-
-//Adjust the position of the game object, factoring in deltaTime for time spent on the game loop
-        x += GameInfo.MINION_SPEED ;
-        y += GameInfo.MINION_SPEED ;
-
-//Check if you have moved past the target by comparing new distance with the old distance
-        if ((Math.sqrt(Math.pow(targetNode.getX() - x, 2) + Math.pow(targetNode.getY() - y, 2))) >= distance) {
-//Move the position to the target to compensate for overshooting the target
-            x = targetNode.getX();
-            y = targetNode.getY();
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

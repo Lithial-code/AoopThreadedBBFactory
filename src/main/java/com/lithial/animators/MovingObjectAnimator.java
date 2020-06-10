@@ -27,7 +27,7 @@ public class MovingObjectAnimator implements Runnable {
             System.out.println("Thread test");
             try{
                 Thread.sleep(
-                        1000);
+                        20);
             } catch (InterruptedException e) {
                 System.out.println("Something interrupted me while im sleeping");
             }
