@@ -1,9 +1,9 @@
-package com.lithial;
+package com.lithial.pathfinding;
 
 import java.util.*;
 
 public class Pathfinder {
-
+    //TODO comment this but otherwise it should be ok.  also maybe add heaps and stuff
     public static List<Node> AStar(List<Node> graph, Node start, Node target){
         List<Node> openList = new ArrayList<>();
         List<Node> closedList = new ArrayList<>();
@@ -27,7 +27,7 @@ public class Pathfinder {
             }
             for (Map.Entry<Node, Integer> neighbour: node.getNeighbours().entrySet()) {
                 Node neigh = neighbour.getKey();
-                if (!neigh.isWalkable() || closedList.contains(neigh))
+                if (!neigh.getIsWalkable() || closedList.contains(neigh))
                 {
                     continue;
                 }

@@ -1,4 +1,6 @@
-package com.lithial;
+package com.lithial.helpers;
+
+import com.lithial.pathfinding.Node;
 
 import java.awt.*;
 import java.util.Map;
@@ -13,13 +15,13 @@ public class Debug {
             if (entry.getKey() != null) {
                 Node n = entry.getKey();
                 System.out.println(n.getName());
-
-                if (entry.getValue() == 1) {
-                    n.setColor(Color.black);
-                } else {
-                    n.setColor(Color.orange);
+                if(n.getIsWalkable()) {
+                    if (entry.getValue() == 1) {
+                        n.setColor(Color.black);
+                    } else {
+                        n.setColor(Color.orange);
+                    }
                 }
-
             }
         }
     }
