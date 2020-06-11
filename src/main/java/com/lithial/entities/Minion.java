@@ -3,13 +3,12 @@ package com.lithial.entities;
 import com.lithial.events.CollisionEvent;
 import com.lithial.events.managers.CollisionManager;
 import com.lithial.helpers.GameInfo;
-import com.lithial.helpers.Vector2;
 import com.lithial.pathfinding.GameMap;
 import com.lithial.pathfinding.Node;
 import com.lithial.pathfinding.Pathfinder;
 
 import java.awt.*;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 //todo make understand what tile its standing on with collisions?
@@ -22,10 +21,13 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
     //positioning variables
     private float x, y;
 
+    //todo find a better way to do this?
+    private Node startNode;
     private Node currentNode;
     private Node targetNode;
-    private Node startNode;
     private Node finalDestinationNode;
+    private Node previousNode;
+
     private List<Node>path;
     private GameMap map;
     //movement variables
@@ -43,19 +45,24 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
         this.map = map;
 
         startNode = map.getNode(4,6);
-        targetNode = map.getNode(12,25);
+
+        targetNode = map.getNode(4,6);
     }
 
 
     //todo change this to use collisions to know what tile its on
-    /*public Node getNodeFromMap(GameMap map)
+    public Node getNodeFromMap(GameMap map)
     {
-        currentNode = map.getNode(currentLocation.getX(),getCurrentLocation().getY());
+        currentNode = map.getNode((int)x,(int)y);
         return currentNode;
-    }*/
+    }
 
-    public Node getCurrentNode() {
-        return currentNode;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setCurrentNode(Node currentNode) {
@@ -78,11 +85,19 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
         this.finalDestinationNode = finalDestinationNode;
     }
 
+    public Node getPreviousNode() {
+        return previousNode;
+    }
+
+    public void setPreviousNode(Node previousNode) {
+        this.previousNode = previousNode;
+    }
+
     @Override
     public void move() {
 
         //if (finalDestinationNode == null) {
-        System.out.println("Moving");
+        //System.out.println("Moving");
         if (targetNode != null){
             if (x < targetNode.getX()){
                 x+=speed;
@@ -97,10 +112,15 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
             else if (y > targetNode.getY()){
                 y-=speed;
             }
-            System.out.println(x + ":" + y);
+            CollisionManager.handleCollision(this);
+            //System.out.println(x + ":" + y);
+
         }
-        if (targetNode.getX() == x && targetNode.getY() == y){
-            System.out.println("we're here!!");
+        else if (targetNode.getX() == x && targetNode.getY() == y){
+            //System.out.println("we're here!!");
+        }
+        else if (targetNode == null){
+            System.out.println("Stop moving");
         }
 
     }
@@ -109,10 +129,10 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
     /**
      * used to draw the token that is used to represent the minion
      * //todo update this to use sprites if time allows
-     * @param graphics
+     * @param g
      */
     @Override
-    public void draw(Graphics graphics) {
+    public void draw(Graphics g) {
         if (targetNode != null){
             targetNode.setColor(Color.magenta);
         }
@@ -120,13 +140,21 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
         {
             startNode.setColor(Color.red);
         }
-        graphics.setColor(color);
-        graphics.fillRect((int)(x * GameInfo.NODE_SIZE), (int)(y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
+        if (previousNode != null){
+            previousNode.setColor(color.white);
+        }
+        g.setColor(color);
+        g.fillRect((int)(x * GameInfo.NODE_SIZE), (int)(y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
     }
 
     @Override
     public Rectangle getBounds() {
         return new Rectangle((int)(x * GameInfo.NODE_SIZE), (int)(y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE,GameInfo.MINION_SIZE);
+    }
+    @Override
+    public void pathfind(){
+        Coin coin = GameInfo.COINS.get(0);
+        targetNode = map.getNode(coin.getX(),coin.getY());
     }
 
     @Override
@@ -138,6 +166,39 @@ public class Minion extends MovingObject implements IDrawable, IColliadable{
         //((Node) eventSource).setColor(Color.red);
         //System.out.println(getCurrentNode().getSimpleName());
     }
+    if (eventSource instanceof Minion){
+        if (collisionEvent.getImpact().equals("top")){
+            y+=speed*4;
+        }
+        else if (collisionEvent.getImpact().equals("bottom")){
+            y-=speed*4;
+        }
+        else if (collisionEvent.getImpact().equals("left")){
+            x+=speed*4;
+        }
+        else if (collisionEvent.getImpact().equals("right")){
+            x-=speed*4;
+        }
+        targetNode = null;
     }
+    if (eventSource instanceof Coin){
+        GameInfo.COINS.remove(eventSource);
+        System.out.println("Gimme that loot");
+        ((Coin) eventSource).setColor(Color.white);
+    }
+    }
+    //todo unjank this
+    public List<Node> findPath() {
+       Coin coin = GameInfo.COINS.get(0);
+       Node start = map.getNode((int)x, (int)y);
+       Node end = map.getNode(coin.getX(),coin.getY());
+       start.setColor(Color.blue);
+       end.setColor(Color.pink);
 
+       List<Node> path = Pathfinder.AStar(start,end);
+/*       for (Node node: path){
+           node.setColor(Color.magenta);
+       }*/
+       return path;
+    }
 }

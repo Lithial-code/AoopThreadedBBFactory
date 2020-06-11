@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Pathfinder {
     //TODO comment this but otherwise it should be ok.  also maybe add heaps and stuff
-    public static List<Node> AStar(List<Node> graph, Node start, Node target){
+    public static List<Node> AStar(Node start, Node target){
         List<Node> openList = new ArrayList<>();
         List<Node> closedList = new ArrayList<>();
 
@@ -44,6 +44,7 @@ public class Pathfinder {
             }
 
         }
+        System.out.println("Path not found");
         return null;
     }
     static List<Node> retracepath(Node start, Node end){

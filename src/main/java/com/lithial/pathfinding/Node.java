@@ -1,7 +1,6 @@
 package com.lithial.pathfinding;
 
 import com.lithial.entities.IColliadable;
-import com.lithial.entities.Minion;
 import com.lithial.events.CollisionEvent;
 import com.lithial.helpers.GameInfo;
 import com.lithial.helpers.Vector2;
@@ -19,6 +18,7 @@ public class Node implements IColliadable {
     private boolean isWalkable;
     private Node parent;
     //todo this doesnt need to be a hashmap anymore
+
     private Map<Node, Integer> neighbours = new HashMap<>();
 
     //required for positioning
@@ -49,7 +49,7 @@ public class Node implements IColliadable {
                 {
                     if (node.getY() < 0 || node.getY() > GameInfo.MAP_SIZE)
                     {
-                        neighbours.put(node, 0);
+                        neighbours.put(node, 1);
                     }
                 }
             }
@@ -181,8 +181,8 @@ public class Node implements IColliadable {
         g.setColor(color);
         g.fillRect(getxPosition(), getyPosition(), size, size);
         //draw gray outline around said box for ease of seeing
-        g.setColor(Color.gray);
-        g.drawRect(getxPosition(), getyPosition(), size, size);
+        //g.setColor(Color.gray);
+        //g.drawRect(getxPosition(), getyPosition(), size, size);
         //debug option to render what node is what on the grid
         if (GameInfo.DEBUG_MODE)
         {

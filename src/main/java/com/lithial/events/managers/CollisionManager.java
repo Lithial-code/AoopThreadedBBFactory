@@ -19,17 +19,6 @@ public class CollisionManager {
         handleOtherShapesCollisions(collidable, others);
     }
 
-    protected static void handleFloorCollision(IColliadable colliadable, List<IColliadable> floor){
-        for (IColliadable otherCollidable : floor) {
-            if (otherCollidable.getBounds().intersects(otherCollidable.getBounds())) {
-                CollisionEvent event = new CollisionEvent(otherCollidable);
-                event.setImpact("floor");
-                colliadable.handleCollision(event);
-                CollisionEvent oppositeEvent=new CollisionEvent(colliadable);
-                otherCollidable.handleCollision(oppositeEvent);
-            }
-        }
-    }
     protected static void handleOtherShapesCollisions(IColliadable collidable, List<IColliadable> others) {
         for (IColliadable otherCollidable : others) {
             if (otherCollidable.getBounds().intersects(collidable.getBounds())) {

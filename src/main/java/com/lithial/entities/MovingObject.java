@@ -6,6 +6,8 @@ public class MovingObject {
     public void move(){
 
     }
+    public void pathfind(){
 
+    }
 
 }

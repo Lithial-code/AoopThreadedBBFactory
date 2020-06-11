@@ -21,10 +21,12 @@ public class MovingObjectAnimator implements Runnable {
     @Override
     public void run() {
         while(true){
+
             movingObject.move();
+            movingObject.pathfind();
             //System.out.println("this thread is running");
             //System.out.println(movingObject.getX() + ":" + movingObject.getY());
-            System.out.println("Thread test");
+           // System.out.println("Thread test");
             try{
                 Thread.sleep(
                         20);
