@@ -21,58 +21,59 @@ public class CollisionManager {
 
     protected static void handleOtherShapesCollisions(IColliadable collidable, List<IColliadable> others) {
         for (IColliadable otherCollidable : others) {
-            if (otherCollidable.getBounds().intersects(collidable.getBounds())) {
-                CollisionEvent event = new CollisionEvent(otherCollidable);
-                double depth = 0;
-                if (collidable.getBounds().getY() < otherCollidable.getBounds().getY() + otherCollidable.getBounds().height) {
-                    //Top border
-                    event.setImpact("top");
-                    depth = otherCollidable.getBounds().getY() + otherCollidable.getBounds().height - collidable.getBounds().getY();
-                }
-                if (collidable.getBounds().getY() + collidable.getBounds().getHeight() > otherCollidable.getBounds().getY()) {
-                    //Bottom border
-                    double newDepth = collidable.getBounds().getY() + collidable.getBounds().getHeight() - otherCollidable.getBounds().getY();
-                    if (event.getImpact() == null || newDepth < depth) {
-                        event.setImpact("bottom");
-                        depth = newDepth;
+            if (otherCollidable.getBounds() != null) {
+                if (otherCollidable.getBounds().intersects(collidable.getBounds())) {
+                    CollisionEvent event = new CollisionEvent(otherCollidable);
+                    double depth = 0;
+                    if (collidable.getBounds().getY() < otherCollidable.getBounds().getY() + otherCollidable.getBounds().height) {
+                        //Top border
+                        event.setImpact("top");
+                        depth = otherCollidable.getBounds().getY() + otherCollidable.getBounds().height - collidable.getBounds().getY();
                     }
-                }
-                //Detect the vertical borders
-                if (collidable.getBounds().getX() < otherCollidable.getBounds().getX() + otherCollidable.getBounds().width) {
-                    //Left border
-                    double newDepth = otherCollidable.getBounds().getX() + otherCollidable.getBounds().width - collidable.getBounds().getX();
-                    if (event.getImpact() == null || newDepth < depth) {
-                        event.setImpact("left");
-                        depth = newDepth;
+                    if (collidable.getBounds().getY() + collidable.getBounds().getHeight() > otherCollidable.getBounds().getY()) {
+                        //Bottom border
+                        double newDepth = collidable.getBounds().getY() + collidable.getBounds().getHeight() - otherCollidable.getBounds().getY();
+                        if (event.getImpact() == null || newDepth < depth) {
+                            event.setImpact("bottom");
+                            depth = newDepth;
+                        }
                     }
-                }
-                if (collidable.getBounds().getX() + collidable.getBounds().getWidth() > otherCollidable.getBounds().getX()) {
-                    //Right border
-                    double newDepth = collidable.getBounds().getX() + collidable.getBounds().getWidth() - otherCollidable.getBounds().getX();
-                    if (event.getImpact() == null || newDepth < depth) {
-                        event.setImpact("right");
+                    //Detect the vertical borders
+                    if (collidable.getBounds().getX() < otherCollidable.getBounds().getX() + otherCollidable.getBounds().width) {
+                        //Left border
+                        double newDepth = otherCollidable.getBounds().getX() + otherCollidable.getBounds().width - collidable.getBounds().getX();
+                        if (event.getImpact() == null || newDepth < depth) {
+                            event.setImpact("left");
+                            depth = newDepth;
+                        }
+                    }
+                    if (collidable.getBounds().getX() + collidable.getBounds().getWidth() > otherCollidable.getBounds().getX()) {
+                        //Right border
+                        double newDepth = collidable.getBounds().getX() + collidable.getBounds().getWidth() - otherCollidable.getBounds().getX();
+                        if (event.getImpact() == null || newDepth < depth) {
+                            event.setImpact("right");
+                        }
+
                     }
 
+                    collidable.handleCollision(event);
+                    CollisionEvent oppositeEvent = new CollisionEvent(collidable);
+                    switch (event.getImpact()) {
+                        case "left":
+                            oppositeEvent.setImpact("right");
+                            break;
+                        case "right":
+                            oppositeEvent.setImpact("left");
+                            break;
+                        case "top":
+                            oppositeEvent.setImpact("bottom");
+                            break;
+                        case "bottom":
+                            oppositeEvent.setImpact("top");
+                    }
+                    otherCollidable.handleCollision(oppositeEvent);
                 }
-
-                collidable.handleCollision(event);
-                CollisionEvent oppositeEvent=new CollisionEvent(collidable);
-                switch (event.getImpact()){
-                    case "left":
-                        oppositeEvent.setImpact("right");
-                        break;
-                    case "right":
-                        oppositeEvent.setImpact("left");
-                        break;
-                    case "top":
-                        oppositeEvent.setImpact("bottom");
-                        break;
-                    case "bottom":
-                        oppositeEvent.setImpact("top");
-                }
-                otherCollidable.handleCollision(oppositeEvent);
             }
         }
     }
-
 }

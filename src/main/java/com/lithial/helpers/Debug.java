@@ -11,18 +11,16 @@ public class Debug {
      * @param node
      */
     public static void PaintNeighbours(Node node) {
-        for(Map.Entry<Node, Integer> entry : node.getNeighbours().entrySet()) {
-            if (entry.getKey() != null) {
-                Node n = entry.getKey();
-                System.out.println(n.getName());
-                if(n.getIsWalkable()) {
-                    if (entry.getValue() == 1) {
+        for(Node n : node.getNeighbours()) {
+            System.out.println(n.getName());
+               // if(n.getIsWalkable()) {
+                    if (node.getfCost() == 1) {
                         n.setColor(Color.black);
                     } else {
                         n.setColor(Color.orange);
                     }
-                }
-            }
+               // }
+
         }
     }
 }

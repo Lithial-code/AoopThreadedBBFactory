@@ -1,6 +1,7 @@
 package com.lithial.rendering;
 
 import com.lithial.entities.Coin;
+import com.lithial.entities.HomeNode;
 import com.lithial.entities.Minion;
 import com.lithial.helpers.GameInfo;
 import com.lithial.pathfinding.GameMap;
@@ -23,11 +24,14 @@ public class CustomPanel extends JPanel {
         for(Node node: gameMap.gridAsList()){
             node.draw(g);
         }
-        for (Minion minion: GameInfo.MINIONS){
-            minion.draw(g);
-        }
         for (Coin coin: GameInfo.COINS){
             coin.draw(g);
+        }
+        for (HomeNode homeNode: GameInfo.HOME_NODES){
+            homeNode.draw(g);
+        }
+        for (Minion minion: GameInfo.MINIONS){
+            minion.draw(g);
         }
     }
 }

@@ -23,7 +23,11 @@ public class MovingObjectAnimator implements Runnable {
         while(true){
 
             movingObject.move();
-            movingObject.pathfind();
+            try {
+                movingObject.pathfind();
+            } catch (Exception e) {
+                System.out.println("Pathfinding Failed");
+            }
             //System.out.println("this thread is running");
             //System.out.println(movingObject.getX() + ":" + movingObject.getY());
            // System.out.println("Thread test");

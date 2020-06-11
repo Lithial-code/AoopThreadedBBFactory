@@ -25,8 +25,8 @@ public class Pathfinder {
                 return retracepath(start,target);
 
             }
-            for (Map.Entry<Node, Integer> neighbour: node.getNeighbours().entrySet()) {
-                Node neigh = neighbour.getKey();
+            for (Node neigh : node.getNeighbours()){
+            //for (Map.Entry<Node, Integer> neighbour: node.getNeighbours().entrySet()) {
                 if (!neigh.getIsWalkable() || closedList.contains(neigh))
                 {
                     continue;

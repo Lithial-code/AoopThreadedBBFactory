@@ -6,6 +6,7 @@ import com.lithial.entities.Minion;
 import com.lithial.events.managers.CollisionManager;
 import com.lithial.helpers.GameInfo;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,13 +51,13 @@ public class GameMap {
      * After creation they are added to a list so I can keep track of them easily
      */
     public void genMinions(){
-        createMinion("Joe", 4,6,this);
-        createMinion("Sam", 12,19,this);
-        createMinion("Arran", 22,24,this);
-        createMinion("Finn", 22,6,this);
+        createMinion("Joe", 4,1, 1,1,this, Color.red); // 4 4 1 1
+        createMinion("Sam", GameInfo.MAX_SIZE - 4,1, GameInfo.MAX_SIZE - 4, 1,this,Color.pink); // max - 4 1 max - 4 1
+        createMinion("Arran", 4, GameInfo.MAX_SIZE - 4, 1, GameInfo.MAX_SIZE - 4,this,Color.magenta); // 4, max -4 , 1,  max
+        createMinion("Finn", GameInfo.MAX_SIZE - 4,GameInfo.MAX_SIZE - 4, GameInfo.MAX_SIZE -4, GameInfo.MAX_SIZE -4,this,Color.yellow);
     }
-    public void createMinion(String name, int x, int y, GameMap map){
-        Minion minion = new Minion(name,x, y, map);
+    public void createMinion(String name, int x, int y, int homeX, int homeY, GameMap map, Color color){
+        Minion minion = new Minion(name,x, y, homeX, homeY, map, color);
         GameInfo.MINIONS.add(minion); //todo make these self initialise
         CollisionManager.addCollidable(minion);
 
@@ -82,6 +83,7 @@ public class GameMap {
                 grid[x][y].setNeighbours(this);
             }
         }
+        System.out.println(grid.toString());
     }
 
     /**
@@ -92,8 +94,13 @@ public class GameMap {
      * @return
      */
     public Node getNode(int x, int y) {
-
-        return grid[x][y];
+        try {
+            return grid[x][y];
+        }
+        catch (Exception e){
+            System.out.println("Coin likely doesnt exist any more");;
+        }
+        return null;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.lithial.helpers;
 
 import com.lithial.entities.Coin;
+import com.lithial.entities.HomeNode;
 import com.lithial.entities.Minion;
 
 import java.awt.*;
@@ -19,11 +20,13 @@ public class GameInfo {
 
     public static List<Minion> MINIONS = new ArrayList<>();
     public static List<Coin> COINS = new ArrayList<>();
+    public static List<HomeNode> HOME_NODES = new ArrayList<>();
+
+    public static int COIN_SIZE = 10;
 
     public static float MINION_SPEED = .25f;
     public static int MINION_SIZE = 20;
     public static Color MINION_COLOR = Color.green;
 
-    //public static List<Thread> THREADS = new ArrayList<>();
     public static Map<String, Thread> THREADS = new HashMap<>();
 }
