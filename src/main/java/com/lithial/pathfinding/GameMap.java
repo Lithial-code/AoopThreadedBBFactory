@@ -1,7 +1,9 @@
 package com.lithial.pathfinding;
 
 import com.lithial.animators.MovingObjectAnimator;
+import com.lithial.animators.PathfindingManager;
 import com.lithial.entities.Coin;
+import com.lithial.entities.HomeNode;
 import com.lithial.entities.Minion;
 import com.lithial.events.managers.CollisionManager;
 import com.lithial.helpers.GameInfo;
@@ -28,18 +30,33 @@ public class GameMap {
         grid = new Node[xSize][ySize];
 
         genNodes();
-        genMinions();
+        genHome();
+
+        //todo make this less jank
         for (int i = 0; i < 10; i++){
-            genCoin();
+            genCoin(i);
         }
+        genMinions();
     }
-    public void genCoin(){
+
+    public void genHome(){
+        createHome(1,1, "Joe");
+        createHome(GameInfo.MAX_SIZE - 4, 1, "Sam");
+        //createHome(1, GameInfo.MAX_SIZE - 4, "Arran" );
+        //createHome(GameInfo.MAX_SIZE - 4, GameInfo.MAX_SIZE -4, "Finn");
+    }
+    public void createHome(int x, int y, String name){
+        HomeNode homeNode = new HomeNode(x, y, name);
+        CollisionManager.addCollidable(homeNode);
+        GameInfo.HOME_NODES.add(homeNode);
+    }
+    public void genCoin(int id){
         Random rand = new Random();
         int x = rand.nextInt(GameInfo.MAX_SIZE);
         int y = rand.nextInt(GameInfo.MAX_SIZE);
         System.out.println(x);
         System.out.println(y);
-        Coin coin = new Coin(x, y);
+        Coin coin = new Coin(x, y, id);
         GameInfo.COINS.add(coin);
         CollisionManager.addCollidable(coin);
 
@@ -51,21 +68,21 @@ public class GameMap {
      * After creation they are added to a list so I can keep track of them easily
      */
     public void genMinions(){
-        createMinion("Joe", 4,1, 1,1,this, Color.red); // 4 4 1 1
-        createMinion("Sam", GameInfo.MAX_SIZE - 4,1, GameInfo.MAX_SIZE - 4, 1,this,Color.pink); // max - 4 1 max - 4 1
-        createMinion("Arran", 4, GameInfo.MAX_SIZE - 4, 1, GameInfo.MAX_SIZE - 4,this,Color.magenta); // 4, max -4 , 1,  max
-        createMinion("Finn", GameInfo.MAX_SIZE - 4,GameInfo.MAX_SIZE - 4, GameInfo.MAX_SIZE -4, GameInfo.MAX_SIZE -4,this,Color.yellow);
+        createMinion("Joe", 4,1,this, Color.red); // 4 4 1 1
+        createMinion("Sam", GameInfo.MAX_SIZE - 4,1, this, Color.pink); // max - 4 1 max - 4 1
+        //createMinion("Arran", 4, GameInfo.MAX_SIZE - 4, this,Color.magenta); // 4, max -4 , 1,  max
+        //createMinion("Finn", GameInfo.MAX_SIZE - 4, GameInfo.MAX_SIZE -4,this,Color.yellow);
     }
-    public void createMinion(String name, int x, int y, int homeX, int homeY, GameMap map, Color color){
-        Minion minion = new Minion(name,x, y, homeX, homeY, map, color);
+    public void createMinion(String name, int x, int y, GameMap map, Color color){
+        Minion minion = new Minion(name,x, y, map, color);
         GameInfo.MINIONS.add(minion); //todo make these self initialise
         CollisionManager.addCollidable(minion);
 
         MovingObjectAnimator minion1 = new MovingObjectAnimator(minion);
         minion1.setMovePerSec(1);
-        Thread thread1 = new Thread(minion1);
-        ////todo hashmap this
-        GameInfo.THREADS.put(minion.getName(),thread1);
+        Thread thread = new Thread(minion1);
+        GameInfo.THREADS.put(minion.getName(),thread);
+        thread.start();
     }
     /**
      * Generate all the map nodes. this is used for the pathfinding alogrithm later on
@@ -94,11 +111,16 @@ public class GameMap {
      * @return
      */
     public Node getNode(int x, int y) {
+        if (x <= 0 || x >= GameInfo.MAX_SIZE){
+            if (y <= 0 || y >= GameInfo.MAX_SIZE){
+                System.out.println("Node at " + x + ":" + y + " doesn't exist");;
+            }
+        }
         try {
             return grid[x][y];
         }
         catch (Exception e){
-            System.out.println("Coin likely doesnt exist any more");;
+            System.out.println("Node at " + x + ":" + y + " doesn't exist");;
         }
         return null;
     }

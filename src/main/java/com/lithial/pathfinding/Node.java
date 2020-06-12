@@ -15,14 +15,12 @@ import java.util.Map;
 
 public class Node extends NodeBase implements IColliadable {
 
-    //todo this needs a refactor probably.
     //required for pathfinding
     private int fCost;
     private  int gCost;
     private  int hCost;
 
     private Node parent;
-    //todo this doesnt need to be a hashmap anymore
 
     //private Map<Integer, Node> neighbours = new HashMap<>();
     List<Node> neighbours = new ArrayList<>();
@@ -31,7 +29,6 @@ public class Node extends NodeBase implements IColliadable {
     public Node(int x, int y) {
         super(x,y);
         this.setIsWalkable(true);
-        //todo make pathfinding work
     }
 
     /**
@@ -39,14 +36,22 @@ public class Node extends NodeBase implements IColliadable {
      *
      */
     public void setNeighbours(GameMap map) {
-        neighbours.add(map.getNode(getX()-1,getY()-1));    //-1 -1
-        neighbours.add(map.getNode(getX()-1, getY()));       //-1 0
-        neighbours.add(map.getNode(getX()-1,getY()+1));     //-1 +1
-        neighbours.add(map.getNode(getX(),getY()-1));          // 0 -1
-        neighbours.add(map.getNode( getX(),getY()+1));          //0 +1
-        neighbours.add(map.getNode(getX()+1,getY()-1));     //+1 -1
-        neighbours.add(map.getNode(getX()+1,getY()));          //+1 0
-        neighbours.add(map.getNode(getX()+1,getY()+1));
+        addLoneNeighbour(map,getX()-1,getY()-1);
+        addLoneNeighbour(map,getX()-1, getY());
+        addLoneNeighbour(map,getX()-1,getY()+1);
+        addLoneNeighbour(map,getX(),getY()-1);
+        addLoneNeighbour(map,getX(),getY()+1);
+        addLoneNeighbour(map,getX()+1,getY()-1);
+        addLoneNeighbour(map,getX()-1,getY()-1);
+        addLoneNeighbour(map,getX()+1,getY());
+        addLoneNeighbour(map,getX()+1,getY()+1);
+    }
+    private void addLoneNeighbour(GameMap map, int x, int y){
+        if ((x >= 1) && x <= GameInfo.MAX_SIZE){
+            if ((y >= 1) && y <= GameInfo.MAX_SIZE){
+                neighbours.add(map.getNode(x,y));
+            }
+        }
     }
     public List<Node> getNeighbours() {
         return neighbours;

@@ -8,16 +8,26 @@ import com.lithial.pathfinding.Node;
 import java.awt.*;
 
 public class HomeNode extends NodeBase {
+    private String name;
 
-    public HomeNode(int x, int y) {
+    public HomeNode(int x, int y, String name) {
         super(x, y);
-        CollisionManager.addCollidable(this);
-        GameInfo.HOME_NODES.add(this);
+        setIsWalkable(true);
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(getX(),getY(), GameInfo.NODE_SIZE,GameInfo.NODE_SIZE);
+        return new Rectangle(getxPosition(),getyPosition(), GameInfo.NODE_SIZE,GameInfo.NODE_SIZE);
     }
 
     @Override

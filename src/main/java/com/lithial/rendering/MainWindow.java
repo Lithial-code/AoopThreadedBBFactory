@@ -33,7 +33,7 @@ public class MainWindow {
         coinButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-              gameMap.genCoin();
+              gameMap.genCoin(11); // todo fix this because its broke for sure
             }
         });
         panel.add(coinButton, BorderLayout.SOUTH);
@@ -46,8 +46,6 @@ public class MainWindow {
         window.setVisible(true);
         window.pack();
 
-
-
         /*-----------------------*/
         //event handler registration
         /*-----------------------*/
@@ -55,9 +53,9 @@ public class MainWindow {
         canvasPanel.addMouseListener(new ClickListener(gameMap));
 
         //start all the minion threads
-        for(Map.Entry<String, Thread> entry : GameInfo.THREADS.entrySet()) {
+   /*     for(Map.Entry<String, Thread> entry : GameInfo.THREADS.entrySet()) {
             entry.getValue().start();
-        }
+        }*/
         /**
          * every 50ms redraw the screen.
          */

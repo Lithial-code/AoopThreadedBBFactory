@@ -2,30 +2,25 @@ package com.lithial.entities;
 
 import com.lithial.events.CollisionEvent;
 import com.lithial.events.managers.CollisionManager;
-import com.lithial.helpers.Debug;
 import com.lithial.helpers.GameInfo;
 import com.lithial.pathfinding.GameMap;
 import com.lithial.pathfinding.Node;
 import com.lithial.pathfinding.Pathfinder;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
-//todo make understand what tile its standing on with collisions?
-//todo make it broadcast its distance to a coin when its dropped
-//todo give it a space to carry a coin in
-//todo make threaded
 public class Minion extends MovingObject implements IDrawable, IColliadable {
     //id variables
     private String name;
     //positioning variables
     private float x, y;
 
-    //todo find a better way to do this?
+    //todo find a better way to do this? // unjank this
     private HomeNode homeNode;
     /// private Node currentNode;
     private Node targetNode;
+    private List<Node> targetPath;
     //private Node finalDestinationNode;
     private Node previousNode;
 
@@ -38,7 +33,8 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
     private Coin inventory;
     private int totalCoinValue;
     private Color pathColor;
-    public Minion(String name, int x, int y, int homeX, int homeY, GameMap map, Color pathColor) {
+
+    public Minion(String name, int x, int y, GameMap map, Color pathColor) {
         this.name = name;
         this.x = x;
         this.y = y;
@@ -47,19 +43,18 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         this.speed = GameInfo.MINION_SPEED;
         this.map = map;
 
-        //startNode = map.getNode(4,6);
-        //targetNode = map.getNode(4,6);
-        homeNode = new HomeNode(homeX, homeY);
         totalCoinValue = 0;
         this.pathColor = pathColor;
-        
     }
-    public int getIntX(){
-        return (int)x;
+
+    public int getIntX() {
+        return (int) x;
     }
-    public int getIntY(){
-        return (int)y;
+
+    public int getIntY() {
+        return (int) y;
     }
+
     public Coin getInventory() {
         return inventory;
     }
@@ -68,14 +63,23 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         this.inventory = inventory;
     }
 
-    public HomeNode getHomeNode() {
-        return homeNode;
+    public Node getHomeNode() {
+        for (HomeNode node : GameInfo.HOME_NODES) {
+            if (node.getName().equals(name)) {
+
+                return map.getNode(node.getX(), node.getY());
+            }
+        }
+        return null;
     }
 
     public void setHomeNode(HomeNode homeNode) {
         this.homeNode = homeNode;
     }
 
+    public Node getCurrentNode(){
+        return map.getNode(getIntX(),getIntY());
+    }
     public String getName() {
         return name;
     }
@@ -92,39 +96,48 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         this.targetNode = targetNode;
     }
 
-    public Node getPreviousNode() {
-        return previousNode;
+    public List<Node> getTargetPath() {
+        return targetPath;
     }
 
-    public void setPreviousNode(Node previousNode) {
-        this.previousNode = previousNode;
+    public void setTargetPath(List<Node> targetPath) {
+        this.targetPath = targetPath;
     }
 
     @Override
     public void move() {
+            targetNode = targetPath.get(0);
 
-
-        if (targetNode != null) {
-            //Debug.PaintNeighbours(targetNode);
-            //System.out.println(targetNode.getSimpleName());
             if (x < targetNode.getX()) {
                 x += speed;
-            } else if (y < targetNode.getY()) {
+            }
+            if (y < targetNode.getY()) {
                 y += speed;
-            } else if (x > targetNode.getX()) {
+            }
+            if (x > targetNode.getX()) {
                 x -= speed;
-            } else if (y > targetNode.getY()) {
+            }
+            if (y > targetNode.getY()) {
                 y -= speed;
             }
+            targetPath = null;
+            targetNode = null;
             CollisionManager.handleCollision(this);
 
-        } else if (targetNode == null) {
-            System.out.println("Stop moving");
-        }
-
     }
-
-
+    @Override
+    public void pathfind(){
+            if (getInventory() == null){
+                System.out.println(targetNode);
+                System.out.println(targetPath);
+                System.out.println("Empty yo pockets");
+                findPath("Coin");
+            }
+            else if (this.getInventory() != null){
+                System.out.println("take that loot home");
+                findPath("Home");
+            }
+    }
     /**
      * used to draw the token that is used to represent the minion
      * //todo update this to use sprites if time allows
@@ -146,26 +159,30 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         return new Rectangle((int) (x * GameInfo.NODE_SIZE), (int) (y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE, GameInfo.MINION_SIZE);
     }
 
-    @Override
-    public void pathfind() {
-        int count = 0;
-        if (count <= GameInfo.COINS.size()){
-        if (inventory == null) {
-            while (GameInfo.COINS.size() > 0) {
-                try {
-                    //System.out.println(getName() + " is searching for coin");
-                    Coin coin = GameInfo.COINS.get(count);
-                    targetNode = map.getNode(coin.getX(), coin.getY());
-                    break;
-                } catch (Exception e) {
-                    System.out.println("couldnt find coin");
+    public void findPath(String type){
+        switch (type){
+            case "Coin":
+            {
+                if (GameInfo.COINS.size() > 0){
+                    try{
+                        Coin coin = GameInfo.COINS.get(GameInfo.COINS.size() -1);
+                        Node n = map.getNode(coin.getX(),coin.getY());
+                        targetPath = Pathfinder.AStar(getCurrentNode(), n);
+                        break;
+                    }
+                 catch (Exception e){
+                     System.out.println(e.getMessage());
+                 }
                 }
-                count++;
             }
-        }
+            case "Home":
+            {
+                targetPath = Pathfinder.AStar(getCurrentNode(), getHomeNode());
+                break;
+            }
+            default: break;
         }
     }
-
     @Override
     public void handleCollision(CollisionEvent collisionEvent) {
         if (collisionEvent.getSource().equals(CollisionEvent.WALLS_EVENT_SOURCE)) {
@@ -186,47 +203,32 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         }
         IColliadable eventSource = (IColliadable) collisionEvent.getSource();
         if (eventSource instanceof Node) {
-
+            //((Node) eventSource).setIsWalkable(false);
         }
         if (eventSource instanceof Minion) {
-            if (collisionEvent.getImpact().equals("top")) {
-                x += speed * GameInfo.NODE_SIZE;
-                y += speed * GameInfo.NODE_SIZE;
-            } else if (collisionEvent.getImpact().equals("bottom")) {
-                x -= speed * GameInfo.NODE_SIZE;
-                y += speed * GameInfo.NODE_SIZE;
-            } else if (collisionEvent.getImpact().equals("left")) {
-                y += speed * GameInfo.NODE_SIZE;
-                x += speed * GameInfo.NODE_SIZE;
-
-            } else if (collisionEvent.getImpact().equals("right")) {
-                y -= speed * GameInfo.NODE_SIZE;
-                x += speed * GameInfo.NODE_SIZE;
-            }
         }
         if (eventSource instanceof Coin) {
             if (this.getInventory() == null) {
-                GameInfo.COINS.remove(eventSource);
                 System.out.println("Gimme that loot");
                 ((Coin) eventSource).setColor(Color.white);
                 this.setInventory((Coin) eventSource);
                 ((Coin) eventSource).setBounds(null);
-                this.targetNode = map.getNode(homeNode.getX(), homeNode.getY());
-                List<Node> path = Pathfinder.AStar(map.getNode(getIntX(),getIntY()),targetNode);
-                for (Node n : path) {
-                    n.setColor(pathColor);
-                }
-
+                GameInfo.COINS.remove(eventSource);
             }
         }
-        if (eventSource instanceof HomeNode){
-            if (eventSource.equals(this.homeNode)){
-            if (this.getInventory() != null){
-                System.out.println(this.getName() + ": coin value " + this.getInventory().getValue());
-                totalCoinValue += this.getInventory().getValue();
-                System.out.println("Total value: " + totalCoinValue);
-                setInventory(null);
-            }
+        if (eventSource instanceof HomeNode) {
+            if (((HomeNode) eventSource).getName().equals(this.getName())) {
+                System.out.println("touched base");
+                if (this.getInventory() != null) {
+                    System.out.println(this.getName() + ": coin value " + this.getInventory().getValue());
+                    totalCoinValue += this.getInventory().getValue();
+                    System.out.println("Total value: " + totalCoinValue);
+                    setInventory(null);
+                    System.out.println("This is empty");
+                    targetPath = null;
+                    targetNode = null;
+//                    System.out.println(getInventory().getId());
+                }
             }
         }
     }

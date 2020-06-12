@@ -41,7 +41,7 @@ public class ClickListener implements MouseListener {
                 if (mouseEvent.getX() >= node.getxPosition() && mouseEvent.getX() <= node.getxPosition() + GameInfo.NODE_SIZE) {
                     if (mouseEvent.getY() >= node.getyPosition() && mouseEvent.getY() <= node.getyPosition() + GameInfo.NODE_SIZE) {
                         if (GameInfo.MINIONS.get(0).getTargetNode() != null){
-                            GameInfo.MINIONS.get(0).setPreviousNode(GameInfo.MINIONS.get(0).getTargetNode());
+                           // GameInfo.MINIONS.get(0).setPreviousNode(GameInfo.MINIONS.get(0).getTargetNode());
                         }
                         GameInfo.MINIONS.get(0).setTargetNode(node);
 
