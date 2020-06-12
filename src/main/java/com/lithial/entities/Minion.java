@@ -1,5 +1,7 @@
 package com.lithial.entities;
 
+import com.lithial.entities.interfaces.IColliadable;
+import com.lithial.entities.interfaces.IDrawable;
 import com.lithial.events.CollisionEvent;
 import com.lithial.events.managers.CollisionManager;
 import com.lithial.helpers.GameInfo;
@@ -16,21 +18,21 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
     //positioning variables
     private float x, y;
 
-    //todo find a better way to do this? // unjank this
-    private HomeNode homeNode;
-
+    //pathfinding variables
     private Node targetNode;
     private List<Node> targetPath;
-
-    private List<Node> path;
     private GameMap map;
+
     //movement variables
     private float speed;
+
     //rendering variables
     private Color color;
+    private Color pathColor;
+
+    //inventory variables
     private Coin inventory;
     private int totalCoinValue;
-    private Color pathColor;
 
     public Minion(String name, int x, int y, GameMap map, Color pathColor) {
         this.name = name;
@@ -48,19 +50,20 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
     public int getIntX() {
         return (int) x;
     }
-
     public int getIntY() {
         return (int) y;
     }
-
     public Coin getInventory() {
         return inventory;
     }
-
     public void setInventory(Coin inventory) {
         this.inventory = inventory;
     }
 
+    /**
+     * finds the home node assosiated with this minion. this is decided by name
+     * @return the home node for this minion
+     */
     public Node getHomeNode() {
         for (HomeNode node : GameInfo.HOME_NODES) {
             if (node.getName().equals(name)) {
@@ -72,9 +75,11 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
     }
 
     public void setHomeNode(HomeNode homeNode) {
-        this.homeNode = homeNode;
     }
 
+    /**
+     * @return the node the minion is on right now
+     */
     public Node getCurrentNode(){
         return map.getNode(getIntX(),getIntY());
     }
@@ -102,6 +107,20 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         this.targetPath = targetPath;
     }
 
+    public int getTotalCoinValue() {
+        return totalCoinValue;
+    }
+
+    public void setTotalCoinValue(int totalCoinValue) {
+        this.totalCoinValue = totalCoinValue;
+    }
+
+    /**
+     * this controlls the minions movement
+     * is called exclusively through the MovingObjectManager
+     * so it can run on its own thread
+     * This runs in conjunction with the pathfind function
+     */
     @Override
     public void move() {
         try {
@@ -124,13 +143,20 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         }
         catch (Exception e){
             System.out.println("Needs more pathfinding. try again");
-            pathfind();
+            pathFind();
         }
         CollisionManager.handleCollision(this);
 
     }
+
+    /**
+     * this controlls the minions path
+     * is called exclusively through the MovingObjectManager
+     * so it can run on its own thread
+     * This runs in conjunction with the move function
+     */
     @Override
-    public void pathfind(){
+    public void pathFind(){
             if (getInventory() == null){
                 //System.out.println(targetNode);
                 //System.out.println(targetPath);
@@ -144,8 +170,7 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
     }
     /**
      * used to draw the token that is used to represent the minion
-     * //todo update this to use sprites if time allows
-     *
+     * at this point its just a little square
      * @param g
      */
     @Override
@@ -154,19 +179,32 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         g.fillRect((int) (x * GameInfo.NODE_SIZE), (int) (y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE, GameInfo.MINION_SIZE);
     }
 
+    /**
+     * Bounding box used for collisions
+     * is a rectangle in the middle of a tile
+     * @return
+     */
     @Override
     public Rectangle getBounds() {
         return new Rectangle((int) (x * GameInfo.NODE_SIZE), (int) (y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE, GameInfo.MINION_SIZE);
     }
 
+    /**
+     * Function for working out if its time to call pathfinding and if so what kind.
+     * @param type
+     */
     public void findPath(String type){
         switch (type){
             case "Coin":
             {
+                System.out.println("Go find a coin");
+                //if its time to look for coins
                 if (GameInfo.COINS.size() > 0){
                     try{
+                        //try looking for a coin in the array
                         Coin coin = GameInfo.COINS.get(GameInfo.COINS.size() -1);
                         Node n = map.getNode(coin.getX(),coin.getY());
+                        //used this to force minions to find a path when they get lost
                         while (targetPath == null){
                             targetPath = Pathfinder.AStar(getCurrentNode(), n);
                         }
@@ -179,30 +217,25 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
             }
             case "Home":
             {
-                targetPath = Pathfinder.AStar(getCurrentNode(), getHomeNode());
+                System.out.println("Go home");
+                //force it to find home if it gets stuck
+                while (targetPath == null){
+                    targetPath = Pathfinder.AStar(getCurrentNode(), getHomeNode());
+                }
                 break;
             }
             default: break;
         }
     }
+
+    /**
+     * Handles the collisions for everything,
+     * used by the collision manager called in move to make sure it interacts with things properly
+     * This needs some more work because things keep getting stuck but It kind of works for now
+     * @param collisionEvent
+     */
     @Override
     public void handleCollision(CollisionEvent collisionEvent) {
-        if (collisionEvent.getSource().equals(CollisionEvent.WALLS_EVENT_SOURCE)) {
-            switch (collisionEvent.getImpact()) {
-                case "left":
-                    x += GameInfo.NODE_SIZE;
-                    break;
-                case "right":
-                    x -= GameInfo.NODE_SIZE;
-                    break;
-                case "top":
-                    y += GameInfo.NODE_SIZE;
-                    break;
-                case "bottom":
-                    y -= GameInfo.NODE_SIZE;
-                    break;
-            }
-        }
         IColliadable eventSource = (IColliadable) collisionEvent.getSource();
         if (eventSource instanceof Node) {
             //((Node) eventSource).setIsWalkable(false);
@@ -229,7 +262,11 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
                     //System.out.println("This is empty");
                     targetPath = null;
                     targetNode = null;
-//                    System.out.println(getInventory().getId());
+                }
+                if (this.getInventory() == null){
+                    targetPath = null;
+                    targetNode = null;
+                    pathFind();
                 }
             }
         }

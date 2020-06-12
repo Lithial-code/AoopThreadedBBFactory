@@ -1,5 +1,6 @@
 package com.lithial.events.listeners;
 
+import com.lithial.entities.Minion;
 import com.lithial.helpers.Debug;
 import com.lithial.helpers.GameInfo;
 import com.lithial.pathfinding.GameMap;
@@ -10,6 +11,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+/**
+ * Used to register clicks on the screen for debugging purposes
+ */
 public class ClickListener implements MouseListener {
     private GameMap gameMap;
     //todo scrap and rebuild
@@ -26,9 +30,11 @@ public class ClickListener implements MouseListener {
     }
 
 
-
-
-
+    /**
+     * Was used in debugging origionally so that I could see my pathfinding
+     * Not going to change it for now
+     * @param mouseEvent
+     */
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
         //todo click drag probably
@@ -40,11 +46,15 @@ public class ClickListener implements MouseListener {
             for (Node node : gameMap.gridAsList()) {
                 if (mouseEvent.getX() >= node.getxPosition() && mouseEvent.getX() <= node.getxPosition() + GameInfo.NODE_SIZE) {
                     if (mouseEvent.getY() >= node.getyPosition() && mouseEvent.getY() <= node.getyPosition() + GameInfo.NODE_SIZE) {
-                        if (GameInfo.MINIONS.get(0).getTargetNode() != null){
-                           // GameInfo.MINIONS.get(0).setPreviousNode(GameInfo.MINIONS.get(0).getTargetNode());
-                        }
-                        GameInfo.MINIONS.get(0).setTargetNode(node);
 
+                        for (Minion minion: GameInfo.MINIONS) {
+                            if (minion.getTargetNode() != null){
+                                System.out.println("On my way");
+                                minion.pathFind();
+                                // GameInfo.MINIONS.get(0).setPreviousNode(GameInfo.MINIONS.get(0).getTargetNode());
+                            }
+
+                        }
                         System.out.println("target node set to: " + node.getSimpleName());
                     }
                 }

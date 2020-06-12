@@ -1,31 +1,47 @@
 package com.lithial.entities;
 
+import com.lithial.entities.interfaces.IColliadable;
+import com.lithial.entities.interfaces.IDrawable;
 import com.lithial.events.CollisionEvent;
 import com.lithial.helpers.GameInfo;
-import com.lithial.pathfinding.Node;
 
 import java.awt.*;
 import java.util.Random;
 
-public class Coin implements IColliadable, IDrawable{
+public class Coin implements IColliadable, IDrawable {
 
+    //positioning
     private int x,y;
     private int xPos, yPos;
+    //value
     private int value;
+    //rendering
     private int radius;
     private Color color;
-    Random rand;
+    //collisions
     private Rectangle bounds;
+    //randomising
+    Random rand;
 
+    /**
+     * @author Lithial
+     * @param x
+     * @param y
+     * value is the random value between 1 and 20 that a coin becomes
+     */
     public Coin(int x, int y) {
         rand = new Random();
+
         this.x = x;
         this.xPos = x * GameInfo.NODE_SIZE;
         this.y = y;
         this.yPos = y * GameInfo.NODE_SIZE;
-        value = rand.nextInt(20);
+
         radius = GameInfo.COIN_SIZE;
         color = Color.orange;
+
+        value = rand.nextInt(20);
+
         bounds = new Rectangle(xPos + (GameInfo.NODE_SIZE /2),yPos + (GameInfo.NODE_SIZE /2), GameInfo.NODE_SIZE/2,GameInfo.NODE_SIZE/2);
     }
 
@@ -71,6 +87,10 @@ public class Coin implements IColliadable, IDrawable{
         return bounds;
     }
 
+    /**
+     * Used by the collision handler to inform pathfinding when its time to go home
+     * @param collisionEvent
+     */
     @Override
     public void handleCollision(CollisionEvent collisionEvent) {
         IColliadable eventSource = (IColliadable) collisionEvent.getSource();
@@ -84,6 +104,10 @@ public class Coin implements IColliadable, IDrawable{
         }
     }
 
+    /**
+     * used by the draw function to draw circles in the centerish of a tile.
+     * @param g
+     */
     @Override
     public void draw(Graphics g) {
         g.setColor(color);

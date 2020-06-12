@@ -1,17 +1,13 @@
 package com.lithial.pathfinding;
 
-import com.lithial.entities.IColliadable;
+import com.lithial.entities.interfaces.IColliadable;
 import com.lithial.entities.NodeBase;
 import com.lithial.events.CollisionEvent;
 import com.lithial.helpers.GameInfo;
-import com.lithial.helpers.Vector2;
-import jdk.nashorn.internal.ir.BaseNode;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Node extends NodeBase implements IColliadable {
 
@@ -25,15 +21,13 @@ public class Node extends NodeBase implements IColliadable {
     //private Map<Integer, Node> neighbours = new HashMap<>();
     List<Node> neighbours = new ArrayList<>();
 
-
     public Node(int x, int y) {
         super(x,y);
         this.setIsWalkable(true);
     }
 
     /**
-     * Find all the nodes neighbours. This doesnt account for neighbours outside of the screen
-     *
+     * Find all the nodes neighbours. This is required for pathfinding
      */
     public void setNeighbours(GameMap map) {
         addLoneNeighbour(map,getX()-1,getY()-1);
@@ -46,6 +40,13 @@ public class Node extends NodeBase implements IColliadable {
         addLoneNeighbour(map,getX()+1,getY());
         addLoneNeighbour(map,getX()+1,getY()+1);
     }
+
+    /**
+     * Small function for checking that neighbours dont appear off screen because we dont count those
+     * @param map access to the game map for access to the node list
+     * @param x x tile location
+     * @param y y tile location
+     */
     private void addLoneNeighbour(GameMap map, int x, int y){
         if ((x >= 1) && x <= GameInfo.MAX_SIZE){
             if ((y >= 1) && y <= GameInfo.MAX_SIZE){
@@ -57,9 +58,6 @@ public class Node extends NodeBase implements IColliadable {
         return neighbours;
     }
 
-    /** //todo write good descriptions of what these are for
-     * @return
-     */
     public int getfCost() {
         return gCost + hCost;
     }
@@ -80,25 +78,20 @@ public class Node extends NodeBase implements IColliadable {
         this.hCost = hCost;
     }
 
-    /**
-     * used in pathfinding to determine what node this connects to
-     * @return
-     */
     public Node getParent() {
         return parent;
     }
-    /**
-     * used in pathfinding to set which node this one connects to in the tree
-     * @param parent
-     */
+
     public void setParent(Node parent) {
         this.parent = parent;
     }
 
     /**
-     * This is required for rendering. Is called by the custom panel via a node list loop
+     * Used to draw the nodes. Currently only used to draw the walls which are just recoloured unwalkable nodes.
+     * has a nifty debug function used to write on the nodes what tile they are
      * @param g
      */
+    @Override
     public void draw(Graphics g){
         //draw filled box of the set color
         if (this.getIsWalkable())
@@ -110,16 +103,23 @@ public class Node extends NodeBase implements IColliadable {
             g.setColor(Color.BLACK);
             g.fillRect(getxPosition(), getyPosition(), getSize(), getSize());
         }
+
         //draw gray outline around said box for ease of seeing
-        //g.setColor(Color.gray);
-        //g.drawRect(getxPosition(), getyPosition(), size, size);
+
         //debug option to render what node is what on the grid
         if (GameInfo.DEBUG_MODE)
         {
+            g.setColor(Color.gray);
+            g.drawRect(getxPosition(), getyPosition(), this.getSize(), this.getSize());
+            g.setColor(Color.cyan);
             g.drawString(getSimpleName(), getxPosition() + 15, getyPosition() + 15 );
         }
     }
 
+    /**
+     * Used in collisions for bounding box logic
+     * @return
+     */
     @Override
     public Rectangle getBounds() {
         return new Rectangle(getxPosition() + (getSize()/ 2), getyPosition() + (getSize()/ 2), (getSize()/ 2), (getSize()/ 2));

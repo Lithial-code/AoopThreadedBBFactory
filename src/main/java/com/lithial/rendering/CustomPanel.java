@@ -10,21 +10,26 @@ import com.lithial.pathfinding.Node;
 import javax.swing.*;
 import java.awt.*;
 
-//todo check this for refactor at the end but its looking pretty good at what it does atm for now at least
+/**
+ * This is in charge of rendering all the entities
+ */
 public class CustomPanel extends JPanel {
     GameMap gameMap;
     public CustomPanel(GameMap gameMap){
         this.gameMap = gameMap;
     }
 
+    /**
+     * This method loops through the list of all the entities and draws them
+     * @param g
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         for(Node node: gameMap.gridAsList()){
-        if (node.getIsWalkable()){
-            node.draw(g);
-        }
+            if (node.getIsWalkable()){
+                node.draw(g);
+            }
         }
         for (Coin coin: GameInfo.COINS){
             coin.draw(g);
@@ -35,5 +40,6 @@ public class CustomPanel extends JPanel {
         for (Minion minion: GameInfo.MINIONS){
             minion.draw(g);
         }
+
     }
 }

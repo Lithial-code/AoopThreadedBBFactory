@@ -1,6 +1,6 @@
 package com.lithial.events.managers;
 
-import com.lithial.entities.IColliadable;
+import com.lithial.entities.interfaces.IColliadable;
 import com.lithial.events.CollisionEvent;
 
 import java.util.ArrayList;

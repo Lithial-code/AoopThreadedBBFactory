@@ -1,10 +1,16 @@
 package com.lithial.entities;
 
+import com.lithial.entities.interfaces.IColliadable;
+import com.lithial.entities.interfaces.IDrawable;
 import com.lithial.events.CollisionEvent;
 import com.lithial.helpers.GameInfo;
 
 import java.awt.*;
 
+/**
+ *  Base class for the nodes.
+ *  Includes IColliadable and IDrawable so that things work
+ */
 public class NodeBase implements IColliadable, IDrawable {
 
     //required for positioning
@@ -18,6 +24,7 @@ public class NodeBase implements IColliadable, IDrawable {
         this.y = y;
         this.color = Color.white;
         this.size = GameInfo.NODE_SIZE;
+
     }
 
     /**

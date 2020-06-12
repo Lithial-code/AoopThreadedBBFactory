@@ -1,17 +1,18 @@
 package com.lithial.entities;
 
-import com.lithial.pathfinding.Node;
+import com.lithial.entities.interfaces.IMoveable;
 
-import java.util.List;
+/**
+ * Base class for anything that moves.
+ * Can easily use it to make any thing else moveable
+ */
+public class MovingObject implements IMoveable {
 
-public class MovingObject {
-
-
-    public void move(){
-
-    }
-    public void pathfind(){
+    public void pathFind(){
 
     }
+    @Override
+    public void move() {
 
+    }
 }

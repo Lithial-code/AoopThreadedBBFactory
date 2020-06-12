@@ -2,6 +2,9 @@ package com.lithial.events;
 
 import java.util.EventObject;
 
+/**
+ * Used to make a new collision event. Look up events if you want to know how to make this work
+ */
 public class CollisionEvent extends EventObject {
     private String impact;
     public static final String WALLS_EVENT_SOURCE = "WALLS";

@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Stores all of my public static final variables for consistancy throughout the project
+ */
 public interface GameInfo {
 
     int MAX_SIZE = 40;
@@ -17,10 +20,13 @@ public interface GameInfo {
     int MAP_SIZE = MAX_SIZE * NODE_SIZE; // ive been making this equal 800 for good results
 
     boolean DEBUG_MODE = false;
+    boolean GEN_WALLS = true;
+    boolean STOP_BUTTON = false;
 
     List<Minion> MINIONS = new ArrayList<>();
     List<Coin> COINS = new ArrayList<>();
     List<HomeNode> HOME_NODES = new ArrayList<>();
+    List<Label> LABELS = new ArrayList<>();
 
     int COIN_SIZE = 10;
 
@@ -29,4 +35,5 @@ public interface GameInfo {
     Color MINION_COLOR = Color.green;
 
     Map<String, Thread> THREADS = new HashMap<>();
+
 }
