@@ -14,29 +14,19 @@ public class Coin implements IColliadable, IDrawable{
     private int value;
     private int radius;
     private Color color;
-    private int id;
     Random rand;
     private Rectangle bounds;
 
-    public Coin(int x, int y, int id) {
+    public Coin(int x, int y) {
         rand = new Random();
         this.x = x;
         this.xPos = x * GameInfo.NODE_SIZE;
         this.y = y;
         this.yPos = y * GameInfo.NODE_SIZE;
-        this.id = id;
         value = rand.nextInt(20);
         radius = GameInfo.COIN_SIZE;
         color = Color.orange;
         bounds = new Rectangle(xPos + (GameInfo.NODE_SIZE /2),yPos + (GameInfo.NODE_SIZE /2), GameInfo.NODE_SIZE/2,GameInfo.NODE_SIZE/2);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getValue() {

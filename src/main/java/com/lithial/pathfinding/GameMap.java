@@ -1,14 +1,17 @@
 package com.lithial.pathfinding;
 
 import com.lithial.animators.MovingObjectAnimator;
-import com.lithial.animators.PathfindingManager;
 import com.lithial.entities.Coin;
 import com.lithial.entities.HomeNode;
 import com.lithial.entities.Minion;
 import com.lithial.events.managers.CollisionManager;
 import com.lithial.helpers.GameInfo;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,6 +26,7 @@ public class GameMap {
 
     public GameMap(int xSize, int ySize) {
 
+
         //this is the size of the game map in tiles
         this.ySize = ySize;
         this.xSize = xSize;
@@ -32,11 +36,38 @@ public class GameMap {
         genNodes();
         genHome();
 
+
+        genMinions();
+        genMap();
         //todo make this less jank
         for (int i = 0; i < 10; i++){
-            genCoin(i);
+            genCoin();
         }
-        genMinions();
+    }
+
+
+    public void genMap(){
+        Color black = new Color(000000);
+
+        try {
+            BufferedImage image = ImageIO.read(new File("map.png"));
+            for (int x = 0; x < xSize; x++) {
+                for (int y = 0; y < ySize; y++) {
+                    if (image.getRGB(x,y) == black.getRGB()){
+                        getNode(x,y).setIsWalkable(false);
+                    }
+                    else
+                    {
+                        getNode(x,y).setIsWalkable(true);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("No maze here is probably an issue");
+        }
+
     }
 
     public void genHome(){
@@ -50,18 +81,19 @@ public class GameMap {
         CollisionManager.addCollidable(homeNode);
         GameInfo.HOME_NODES.add(homeNode);
     }
-    public void genCoin(int id){
+    public void genCoin(){
         Random rand = new Random();
         int x = rand.nextInt(GameInfo.MAX_SIZE);
         int y = rand.nextInt(GameInfo.MAX_SIZE);
+        while(!getNode(x,y).getIsWalkable()){
+            x = rand.nextInt(GameInfo.MAX_SIZE);
+            y = rand.nextInt(GameInfo.MAX_SIZE);
+        }
         System.out.println(x);
         System.out.println(y);
-        Coin coin = new Coin(x, y, id);
+        Coin coin = new Coin(x, y);
         GameInfo.COINS.add(coin);
         CollisionManager.addCollidable(coin);
-
-        //todo we'll come back to this?
-        //GameInfo.MINIONS.get(0).findPath();
     }
     /**
      * This is where I'm registering all the minions. there will be four to start with
@@ -82,7 +114,6 @@ public class GameMap {
         minion1.setMovePerSec(1);
         Thread thread = new Thread(minion1);
         GameInfo.THREADS.put(minion.getName(),thread);
-        thread.start();
     }
     /**
      * Generate all the map nodes. this is used for the pathfinding alogrithm later on
@@ -100,7 +131,7 @@ public class GameMap {
                 grid[x][y].setNeighbours(this);
             }
         }
-        System.out.println(grid.toString());
+        //System.out.println(grid.toString());
     }
 
     /**
@@ -113,7 +144,9 @@ public class GameMap {
     public Node getNode(int x, int y) {
         if (x <= 0 || x >= GameInfo.MAX_SIZE){
             if (y <= 0 || y >= GameInfo.MAX_SIZE){
-                System.out.println("Node at " + x + ":" + y + " doesn't exist");;
+                if (GameInfo.DEBUG_MODE) {
+                    System.out.println("Node at " + x + ":" + y + " doesn't exist");
+                }
             }
         }
         try {

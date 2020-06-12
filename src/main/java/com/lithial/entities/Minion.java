@@ -18,11 +18,9 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
 
     //todo find a better way to do this? // unjank this
     private HomeNode homeNode;
-    /// private Node currentNode;
+
     private Node targetNode;
     private List<Node> targetPath;
-    //private Node finalDestinationNode;
-    private Node previousNode;
 
     private List<Node> path;
     private GameMap map;
@@ -106,6 +104,7 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
 
     @Override
     public void move() {
+        try {
             targetNode = targetPath.get(0);
 
             if (x < targetNode.getX()) {
@@ -122,19 +121,24 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
             }
             targetPath = null;
             targetNode = null;
-            CollisionManager.handleCollision(this);
+        }
+        catch (Exception e){
+            System.out.println("Needs more pathfinding. try again");
+            pathfind();
+        }
+        CollisionManager.handleCollision(this);
 
     }
     @Override
     public void pathfind(){
             if (getInventory() == null){
-                System.out.println(targetNode);
-                System.out.println(targetPath);
-                System.out.println("Empty yo pockets");
+                //System.out.println(targetNode);
+                //System.out.println(targetPath);
+                //System.out.println("Empty yo pockets");
                 findPath("Coin");
             }
             else if (this.getInventory() != null){
-                System.out.println("take that loot home");
+                //System.out.println("take that loot home");
                 findPath("Home");
             }
     }
@@ -146,10 +150,6 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
      */
     @Override
     public void draw(Graphics g) {
-
-        if (previousNode != null) {
-            previousNode.setColor(color.white);
-        }
         g.setColor(color);
         g.fillRect((int) (x * GameInfo.NODE_SIZE), (int) (y * GameInfo.NODE_SIZE), GameInfo.MINION_SIZE, GameInfo.MINION_SIZE);
     }
@@ -167,7 +167,9 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
                     try{
                         Coin coin = GameInfo.COINS.get(GameInfo.COINS.size() -1);
                         Node n = map.getNode(coin.getX(),coin.getY());
-                        targetPath = Pathfinder.AStar(getCurrentNode(), n);
+                        while (targetPath == null){
+                            targetPath = Pathfinder.AStar(getCurrentNode(), n);
+                        }
                         break;
                     }
                  catch (Exception e){
@@ -209,22 +211,22 @@ public class Minion extends MovingObject implements IDrawable, IColliadable {
         }
         if (eventSource instanceof Coin) {
             if (this.getInventory() == null) {
-                System.out.println("Gimme that loot");
+                //System.out.println("Gimme that loot");
                 ((Coin) eventSource).setColor(Color.white);
                 this.setInventory((Coin) eventSource);
-                ((Coin) eventSource).setBounds(null);
+                //((Coin) eventSource).setBounds(null);
                 GameInfo.COINS.remove(eventSource);
             }
         }
         if (eventSource instanceof HomeNode) {
             if (((HomeNode) eventSource).getName().equals(this.getName())) {
-                System.out.println("touched base");
+                //System.out.println("touched base");
                 if (this.getInventory() != null) {
-                    System.out.println(this.getName() + ": coin value " + this.getInventory().getValue());
+                    //System.out.println(this.getName() + ": coin value " + this.getInventory().getValue());
                     totalCoinValue += this.getInventory().getValue();
-                    System.out.println("Total value: " + totalCoinValue);
+                    //System.out.println("Total value: " + totalCoinValue);
                     setInventory(null);
-                    System.out.println("This is empty");
+                    //System.out.println("This is empty");
                     targetPath = null;
                     targetNode = null;
 //                    System.out.println(getInventory().getId());

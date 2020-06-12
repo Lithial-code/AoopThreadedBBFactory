@@ -21,9 +21,11 @@ public class CustomPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-    /*    for(Node node: gameMap.gridAsList()){
+        for(Node node: gameMap.gridAsList()){
+        if (node.getIsWalkable()){
             node.draw(g);
-        }*/
+        }
+        }
         for (Coin coin: GameInfo.COINS){
             coin.draw(g);
         }

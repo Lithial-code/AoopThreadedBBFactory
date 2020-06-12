@@ -101,8 +101,15 @@ public class Node extends NodeBase implements IColliadable {
      */
     public void draw(Graphics g){
         //draw filled box of the set color
-        g.setColor(this.getColor());
-        g.fillRect(getxPosition(), getyPosition(), getSize(), getSize());
+        if (this.getIsWalkable())
+        {
+            g.setColor(this.getColor());
+            g.fillRect(getxPosition(), getyPosition(), getSize(), getSize());
+        }
+       else{
+            g.setColor(Color.BLACK);
+            g.fillRect(getxPosition(), getyPosition(), getSize(), getSize());
+        }
         //draw gray outline around said box for ease of seeing
         //g.setColor(Color.gray);
         //g.drawRect(getxPosition(), getyPosition(), size, size);
